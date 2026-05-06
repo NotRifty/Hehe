@@ -23,7 +23,7 @@ svg{width:180px;height:180px}
 @keyframes fadeIn{to{opacity:1}}
 
 /* FALLING PETALS */
-.petal-fall{position:fixed;top:-20px;width:15px;height:15px;background:#ff6b81;border-radius:50%;opacity:0.7;animation:fall linear forwards}
+.petal-fall{position:fixed;top:-20px;width:15px;height:15px;background:#ff6b81;border-radius:50%;opacity:.7;animation:fall linear forwards}
 @keyframes fall{to{transform:translateY(100vh) rotate(360deg);opacity:0}}
 
 /* CAROUSEL */
@@ -44,8 +44,36 @@ svg{width:180px;height:180px}
 .popup.active{opacity:1;pointer-events:auto}
 .popup-box{background:#1e293b;padding:20px;border-radius:15px;max-width:300px;text-align:center}
 
+/* FINAL MESSAGE */
 .message{max-width:600px;text-align:center;line-height:1.6;font-size:1.2em;padding:20px}
 button{margin-top:20px;padding:10px 18px;border:none;border-radius:25px;background:#ff4b5c;color:#fff;cursor:pointer}
+
+/* FINAL POPUP (ONE LAST THING) */
+.final-popup{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.75);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  opacity:0;
+  pointer-events:none;
+  transition:.3s;
+}
+.final-popup.active{opacity:1;pointer-events:auto}
+.final-box{
+  background:linear-gradient(135deg,#ff4d6d,#ff758f);
+  padding:30px;
+  border-radius:20px;
+  text-align:center;
+  transform:scale(.5);
+  animation:pop .4s forwards;
+  max-width:300px;
+  font-size:1.2em;
+}
+@keyframes pop{
+  to{transform:scale(1)}
+}
 </style>
 </head>
 <body>
@@ -72,7 +100,7 @@ button{margin-top:20px;padding:10px 18px;border:none;border-radius:25px;backgrou
     <div class="ring">
       <img src="1.png.jpeg" onclick="openMsg('This was one of my favorite memories ❤️')">
       <img src="2.png.jpeg" onclick="openMsg('I still remember this 💕')">
-      <img src="3.png.jpeg" onclick="openMsg('You looked so cute here ')">
+      <img src="3.png.jpeg" onclick="openMsg('You looked so cute here')">
       <img src="4.png.jpeg" onclick="openMsg('One of our happiest moments')">
       <img src="5.png.jpeg" onclick="openMsg('I miss this day')">
       <img src="6.png.jpeg" onclick="openMsg('More memories to come 💖')">
@@ -86,12 +114,21 @@ button{margin-top:20px;padding:10px 18px;border:none;border-radius:25px;backgrou
   <h1>Happy 8th Monthsary ❤️</h1>
   <p id="counter"></p>
   <div class="message" id="typeText"></div>
-  <button onclick="alert('I love you so much ❤️')">One last thing…</button>
+  <button onclick="openFinal()">One last thing…</button>
 </div>
 
 <!-- POPUP -->
 <div class="popup" id="popup" onclick="closeMsg()">
   <div class="popup-box" id="popupText"></div>
+</div>
+
+<!-- FINAL POPUP -->
+<div class="final-popup" id="finalPopup" onclick="closeFinal()">
+  <div class="final-box">
+    I just want you to know…<br><br>
+    No matter what happens, in every version of life,<br>
+    I would still find you and choose you. ❤️
+  </div>
 </div>
 
 <audio id="bgMusic" loop>
@@ -103,24 +140,21 @@ function goGallery(){
   document.getElementById('intro').classList.add('hidden');
   document.getElementById('gallery').classList.remove('hidden');
 
-  const music = document.getElementById('bgMusic');
-  music.volume = 0;
+  const music=document.getElementById('bgMusic');
+  music.volume=0;
   music.play();
 
-  let fade = setInterval(()=>{
-    if(music.volume < 1){
-      music.volume += 0.05;
-    } else { clearInterval(fade); }
+  let fade=setInterval(()=>{
+    if(music.volume<1){music.volume+=0.05}else{clearInterval(fade)}
   },200);
 
-  // falling petals
   for(let i=0;i<20;i++){
-    let petal=document.createElement('div');
-    petal.className='petal-fall';
-    petal.style.left=Math.random()*100+'vw';
-    petal.style.animationDuration=(2+Math.random()*3)+'s';
-    document.body.appendChild(petal);
-    setTimeout(()=>petal.remove(),5000);
+    let p=document.createElement('div');
+    p.className='petal-fall';
+    p.style.left=Math.random()*100+'vw';
+    p.style.animationDuration=(2+Math.random()*3)+'s';
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(),5000);
   }
 }
 
@@ -130,16 +164,20 @@ function goFinal(){
   typeWriter();
 }
 
-function openMsg(text){
+function openMsg(t){
   document.getElementById('popup').classList.add('active');
-  document.getElementById('popupText').innerText=text;
+  document.getElementById('popupText').innerText=t;
 }
-function closeMsg(){
-  document.getElementById('popup').classList.remove('active');
+function closeMsg(){document.getElementById('popup').classList.remove('active')}
+
+function openFinal(){
+  document.getElementById('finalPopup').classList.add('active');
+}
+function closeFinal(){
+  document.getElementById('finalPopup').classList.remove('active');
 }
 
-// typing effect
-const text="8 months with you feels like the best thing that ever happened to me. Every moment with you is special, and I can't wait for more memories. I'll always choose you. 💕";
+const text="8 months with you feels like the best thing that ever happened to me. Every moment with you is special, and I can't wait for more memories. If I had to choose again in every lifetime, it would still be you—always you. 💕";
 let i=0;
 function typeWriter(){
   if(i<text.length){
@@ -149,7 +187,6 @@ function typeWriter(){
   }
 }
 
-// day counter
 const startDate=new Date("2025-09-06");
 const today=new Date();
 const days=Math.floor((today-startDate)/(1000*60*60*24));
